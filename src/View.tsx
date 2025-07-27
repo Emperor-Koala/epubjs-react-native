@@ -36,8 +36,8 @@ export function View({
   onFinish = () => {},
   onPress = () => {},
   onSingleTap = () => {},
-  onDoublePress = () => {},
-  onDoubleTap = () => {},
+  onDoublePress,
+  onDoubleTap,
   onLongPress = () => {},
   width,
   height,
@@ -421,10 +421,10 @@ export function View({
         onPress();
         onSingleTap();
       }}
-      onDoubleTap={() => {
-        onDoublePress();
-        onDoubleTap();
-      }}
+      onDoubleTap={onDoublePress || onDoubleTap ? () => {
+        onDoublePress?.();
+        onDoubleTap?.();
+      } : undefined}
       onLongPress={onLongPress}
       onSwipeLeft={() => {
         if (enableSwipe) {

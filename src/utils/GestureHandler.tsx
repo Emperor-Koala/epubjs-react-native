@@ -5,14 +5,14 @@ import {
 	GestureDetector,
 	Gesture,
 	Directions,
-	TouchableWithoutFeedback,
+  Pressable,
 } from "react-native-gesture-handler"
 
 interface Props {
 	width?: DimensionValue
 	height?: DimensionValue
 	onSingleTap: () => void
-	onDoubleTap: () => void
+	onDoubleTap?: () => void
 	onSwipeLeft: () => void
 	onSwipeRight: () => void
 	onSwipeUp: () => void
@@ -39,7 +39,7 @@ export function GestureHandler({
 		.runOnJS(true)
 		.maxDuration(250)
 		.numberOfTaps(2)
-		.onStart(onDoubleTap)
+		.onStart(() => onDoubleTap?.())
 
 	const longPress = Gesture.LongPress().runOnJS(true).onStart(onLongPress)
 
@@ -61,6 +61,10 @@ export function GestureHandler({
 	let timer: NodeJS.Timeout
 
 	const handleDoubleTap = () => {
+    if (!onDoubleTap) {
+      onSingleTap();
+      return;
+    }
 		if (lastTap) {
 			onDoubleTap()
 			clearTimeout(timer)
@@ -89,13 +93,13 @@ export function GestureHandler({
 						singleTap,
 					)}
 				>
-					<TouchableWithoutFeedback
+					<Pressable
 						style={{ width, height }}
-						onPress={() => Platform.OS === "ios" && handleDoubleTap()}
-						onLongPress={() => Platform.OS === "ios" && onLongPress()}
+						onPress={handleDoubleTap}
+						onLongPress={onLongPress}
 					>
 						{children}
-					</TouchableWithoutFeedback>
+					</Pressable>
 				</GestureDetector>
 			</GestureHandlerRootView>
 		)
