@@ -57,27 +57,25 @@ export function GestureHandler({
 
 	const swipeDown = Gesture.Fling().runOnJS(true).direction(Directions.DOWN).onStart(onSwipeDown)
 
-	let lastTap: number | null = null
-	let timer: NodeJS.Timeout
+	const timer = React.useRef<NodeJS.Timeout | null>(null);
 
-	const handleDoubleTap = () => {
+	const handleDoubleTap = React.useCallback(() => {
     if (!onDoubleTap) {
       onSingleTap();
       return;
     }
-		if (lastTap) {
+		if (timer.current) {
 			onDoubleTap()
-			clearTimeout(timer)
-			lastTap = null
+			clearTimeout(timer.current)
+      timer.current = null
 		} else {
-			lastTap = Date.now()
-			timer = setTimeout(() => {
+			timer.current = setTimeout(() => {
 				onSingleTap()
-				lastTap = null
-				clearTimeout(timer)
+				clearTimeout(timer.current!)
+				timer.current = null
 			}, 500)
 		}
-	}
+	}, [timer, onSingleTap, onDoubleTap]);
 
 	if (Platform.OS === "ios") {
 		return (
